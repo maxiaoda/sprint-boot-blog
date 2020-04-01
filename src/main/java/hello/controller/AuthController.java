@@ -90,5 +90,9 @@ public class AuthController {
         public boolean isLogin() {
             return isLogin;
         }
+
+        public Object getData() {
+            return data;
+        }
     }
 }
