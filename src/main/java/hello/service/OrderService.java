@@ -13,7 +13,7 @@ public class OrderService {
         this.userService = userService;
     }
 
-    public User placeOrder(Integer userId, String item) {
-        return userService.getUserById(userId);
-    }
+//    public User placeOrder(Integer userId, String item) {
+////        return userService.getUserById(userId);
+////    }
 }
