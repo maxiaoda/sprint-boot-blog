@@ -38,9 +38,9 @@ public class AuthController {
 
         User loggerInUser = userService.getUserByUsername(userName);
         if (loggerInUser == null) {
-            return new Result("ok", "用户没有登录", false);
+            return Result.statusIsOkAndLoginIsFalse("用户没有登录");
         } else {
-            return new Result("ok", null, true, loggerInUser);
+            return Result.successMsg(null, loggerInUser);
         }
     }
 
@@ -51,21 +51,21 @@ public class AuthController {
         String password = usernameAndPassword.get("password").toString();
 
         if (username == null || password == null) {
-            return new Result("fail", "username/password ==null", false);
+            return Result.failMsg("用户名或密码为空");
         }
         if (username.length() < 1 || username.length() > 15) {
-            return new Result("fail", "invalid username", false);
+            return Result.failMsg("用户名不符合格式");
         }
         if (password.length() < 6 || password.length() > 15) {
-            return new Result("fail", "invalid password", false);
+            return Result.failMsg("密码不符合格式");
         }
 
         try {
             userService.save(username, password);
         } catch (DuplicateKeyException e) {
-            return new Result("fail", "user already exists", false);
+            return Result.failMsg("用户已经存在");
         }
-        return new Result("ok", "success!", false);
+        return Result.statusIsOkAndLoginIsFalse("成功!");
     }
 
     @PostMapping("/auth/login")
@@ -79,7 +79,7 @@ public class AuthController {
             userDetails = userService.loadUserByUsername(username);
 
         } catch (UsernameNotFoundException e) {
-            return new Result("fail", "用户不存在", false);
+            return Result.failMsg("用户不存在");
         }
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
@@ -90,9 +90,9 @@ public class AuthController {
             //Cookie
             SecurityContextHolder.getContext().setAuthentication(token);
 
-            return new Result("ok", "登录成功", true, userService.getUserByUsername(username));
+            return Result.successMsg("登录成功", userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
-            return new Result("fail", "密码不正确", false);
+            return Result.failMsg("密码不正确");
         }
     }
 
@@ -103,10 +103,10 @@ public class AuthController {
         User loggerInUser = userService.getUserByUsername(userName);
 
         if (loggerInUser == null) {
-            return new Result("fail", "用户没有登录", false);
+            return Result.failMsg("用户没有登录");
         } else {
             SecurityContextHolder.clearContext();
-            return new Result("ok", "注销成功", false);
+            return Result.statusIsOkAndLoginIsFalse("注销成功");
         }
     }
 
