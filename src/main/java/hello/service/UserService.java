@@ -16,6 +16,7 @@ public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserMapper userMapper;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Inject
     public UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
                        UserMapper userMapper) {
