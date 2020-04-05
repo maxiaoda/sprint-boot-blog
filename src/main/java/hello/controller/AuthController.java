@@ -1,6 +1,6 @@
 package hello.controller;
 
-import hello.entity.Result;
+import hello.entity.LoginResult;
 import hello.entity.User;
 import hello.service.UserService;
 import org.springframework.dao.DuplicateKeyException;
@@ -34,45 +34,45 @@ public class AuthController {
 
     @GetMapping("/auth")
     @ResponseBody
-    public Object auth() {
+    public LoginResult auth() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         User loggerInUser = userService.getUserByUsername(authentication == null ? null : authentication.getName());
 
         if (loggerInUser == null) {
-            return Result.statusIsOkAndLoginIsFalse("用户没有登录");
+            return LoginResult.statusIsOkAndLoginIsFalse("用户没有登录");
         } else {
-            return Result.successMsg(null, loggerInUser);
+            return LoginResult.successMsg(null, loggerInUser);
         }
     }
 
     @PostMapping("/auth/register")
     @ResponseBody
-    public Result register(@RequestBody Map<String, Object> usernameAndPassword) {
+    public LoginResult register(@RequestBody Map<String, Object> usernameAndPassword) {
         String username = usernameAndPassword.get("username").toString();
         String password = usernameAndPassword.get("password").toString();
 
         if (username == null || password == null) {
-            return Result.failMsg("用户名或密码为空");
+            return LoginResult.failMsg("用户名或密码为空");
         }
         if (username.length() < 1 || username.length() > 15) {
-            return Result.failMsg("用户名不符合格式");
+            return LoginResult.failMsg("用户名不符合格式");
         }
         if (password.length() < 6 || password.length() > 15) {
-            return Result.failMsg("密码不符合格式");
+            return LoginResult.failMsg("密码不符合格式");
         }
 
         try {
             userService.save(username, password);
         } catch (DuplicateKeyException e) {
-            return Result.failMsg("用户已经存在");
+            return LoginResult.failMsg("用户已经存在");
         }
-        return Result.statusIsOkAndLoginIsFalse("成功!");
+        return LoginResult.statusIsOkAndLoginIsFalse("成功!");
     }
 
     @PostMapping("/auth/login")
     @ResponseBody
-    public Result login(@RequestBody Map<String, Object> usernameAndPassword) {
+    public LoginResult login(@RequestBody Map<String, Object> usernameAndPassword) {
         String username = usernameAndPassword.get("username").toString();
         String password = usernameAndPassword.get("password").toString();
 
@@ -81,7 +81,7 @@ public class AuthController {
             userDetails = userService.loadUserByUsername(username);
 
         } catch (UsernameNotFoundException e) {
-            return Result.failMsg("用户不存在");
+            return LoginResult.failMsg("用户不存在");
         }
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
@@ -92,23 +92,23 @@ public class AuthController {
             //Cookie
             SecurityContextHolder.getContext().setAuthentication(token);
 
-            return Result.successMsg("登录成功", userService.getUserByUsername(username));
+            return LoginResult.successMsg("登录成功", userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
-            return Result.failMsg("密码不正确");
+            return LoginResult.failMsg("密码不正确");
         }
     }
 
     @GetMapping("/auth/logout")
     @ResponseBody
-    public Object logout() {
+    public LoginResult logout() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         User loggerInUser = userService.getUserByUsername(userName);
 
         if (loggerInUser == null) {
-            return Result.failMsg("用户没有登录");
+            return LoginResult.failMsg("用户没有登录");
         } else {
             SecurityContextHolder.clearContext();
-            return Result.statusIsOkAndLoginIsFalse("注销成功");
+            return LoginResult.statusIsOkAndLoginIsFalse("注销成功");
         }
     }
 

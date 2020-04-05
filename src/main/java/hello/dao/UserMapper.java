@@ -1,4 +1,4 @@
-package hello.mapper;
+package hello.dao;
 
 import hello.entity.User;
 import org.apache.ibatis.annotations.Insert;
