@@ -11,21 +11,26 @@ import java.util.List;
 @Service
 public class BlogService {
     private BlogDao blogDao;
+    private UserService userService;
 
     @Inject
-    public BlogService(BlogDao blogDao) {
+    public BlogService(BlogDao blogDao, UserService userService) {
         this.blogDao = blogDao;
+        this.userService = userService;
     }
 
     public BlogResult getBlogs(Integer page, Integer pageSize, Integer userId) {
-       try {
-           List<Blog> blogs = blogDao.getBlogs(page, pageSize, userId);
-           int count = blogDao.count(userId);
+        try {
+            List<Blog> blogs = blogDao.getBlogs(page, pageSize, userId);
 
-           int totalPage = count % pageSize == 0 ? count / pageSize : count / pageSize + 1;
-           return BlogResult.successMsg(blogs,count,page,totalPage);
-       }catch (Exception e){
-           return BlogResult.failureMsg("系统异常");
-       }
+            blogs.forEach(blog -> blog.setUser(userService.getUserById(blog.getUserId())));
+
+            int count = blogDao.count(userId);
+
+            int totalPage = count % pageSize == 0 ? count / pageSize : count / pageSize + 1;
+            return BlogResult.successMsg(blogs, count, page, totalPage);
+        } catch (Exception e) {
+            return BlogResult.failureMsg("系统异常");
+        }
     }
 }
