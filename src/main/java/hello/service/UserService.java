@@ -13,16 +13,12 @@ import java.util.Collections;
 
 @Service
 public class UserService implements UserDetailsService {
+    @Inject
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private UserMapper userMapper;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Inject
-    public UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
-                       UserMapper userMapper) {
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.userMapper = userMapper;
-    }
+    private UserMapper userMapper;
 
     public void save(String username, String password) {
         userMapper.save(username, bCryptPasswordEncoder.encode(password));
